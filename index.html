@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>亞德醫材｜保固查詢 DEMO</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", "Heiti TC", Arial, sans-serif; margin: 0; background:#f7f7f7; }
+    header { background:#70B24D; color:#fff; padding:16px; }
+    .wrap { max-width:960px; margin:0 auto; padding:16px; }
+    .card { background:#fff; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,.06); padding:16px; margin:12px 0; }
+    .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .row > * { flex:1 1 200px; }
+    label { font-size:14px; color:#333; display:block; margin-bottom:6px; }
+    input { width:100%; padding:12px 14px; border:1px solid #ddd; border-radius:10px; font-size:16px; }
+    button { background:#70B24D; color:#fff; border:none; padding:12px 18px; border-radius:10px; font-size:16px; cursor:pointer; }
+    .result { display:flex; gap:16px; align-items:center; }
+    .meta { font-size:14px; line-height:1.6; }
+    .badge { background:#eef8ea; color:#2f6b1d; padding:2px 8px; border-radius:99px; font-size:12px; margin-left:6px; }
+    .warn { color:#c62828; font-weight:600; }
+    img { width:88px; height:88px; object-fit:cover; border-radius:10px; border:1px solid #eee; }
+    .footer-note { font-size:13px; color:#666; padding:8px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1 style="margin:0;font-size:22px;">亞德醫材｜保固查詢 DEMO</h1>
+      <div class="footer-note">輸入 <b>手機後四碼</b> ＋ <b>發票後四碼</b>，即可查詢保固。</div>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="card">
+      <div class="row">
+        <div>
+          <label>手機後四碼</label>
+          <input id="phone" placeholder="例如：1688" maxlength="4" inputmode="numeric">
+        </div>
+        <div>
+          <label>發票後四碼</label>
+          <input id="inv" placeholder="例如：4485" maxlength="4" inputmode="numeric">
+        </div>
+        <div style="flex:0 0 auto; align-self:flex-end;">
+          <button id="btn">查詢</button>
+        </div>
+      </div>
+    </div>
+    <div id="out"></div>
+    <div class="card">
+      <div class="footer-note">此頁僅示範。正式上線請改為讀取 Google 試算表或資料庫；同時啟用會員登入或以手機驗證碼加強隱私保護。</div>
+    </div>
+  </main>
+  <script>
+    const records = [{"RecordID": "YY-2024-0001", "CustomerName": "王小明", "PhoneLast4": "1688", "InvoiceNo": "RF08394485", "ProductName": "體重體脂計", "Brand": "OMRON", "Model": "HBF-212-TWW", "SerialNo": "C0285234", "PurchaseDate": "2019-05-23", "WarrantyMonths": 12, "Shop": "亞德醫材-江子翠門市", "Notes": "門市購買", "ImageURL": "https://dummyimage.com/120x120/eeeeee/000000&text=HBF-212", "WarrantyUntil": "2020-05-23", "LookupKey": "16884485"}, {"RecordID": "YY-2024-0002", "CustomerName": "林○○", "PhoneLast4": "9527", "InvoiceNo": "RF08395531", "ProductName": "電子血壓計(新型)", "Brand": "OMRON", "Model": "HEM-7142T", "SerialNo": "B0193342", "PurchaseDate": "2020-02-11", "WarrantyMonths": 24, "Shop": "亞德醫材-新埔門市", "Notes": "會員折扣", "ImageURL": "https://dummyimage.com/120x120/eeeeee/000000&text=HEM-7142T", "WarrantyUntil": "2022-02-11", "LookupKey": "95275331"}, {"RecordID": "YY-2024-0003", "CustomerName": "陳小姐", "PhoneLast4": "3344", "InvoiceNo": "RF08396666", "ProductName": "輪椅坐墊", "Brand": "KARMA", "Model": "KP-31", "SerialNo": "S0008891", "PurchaseDate": "2024-09-01", "WarrantyMonths": 12, "Shop": "亞德醫材-線上訂單", "Notes": "宅配", "ImageURL": "https://dummyimage.com/120x120/eeeeee/000000&text=KP-31", "WarrantyUntil": "2025-09-01", "LookupKey": "33446666"}];
+    function render(items) {
+      const out = document.getElementById('out');
+      out.innerHTML = '';
+      if (!items.length) {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = '<div class="warn">查無資料，請確認輸入是否正確，或聯繫客服。</div>';
+        out.appendChild(div);
+        return;
+      }
+      items.forEach(r => {
+        const c = document.createElement('div');
+        c.className = 'card';
+        const exp = new Date(r.WarrantyUntil);
+        const today = new Date();
+        const within30 = (exp - today) / (1000*60*60*24) <= 30;
+        const expired = exp < today;
+        const status = expired ? '已過保' : (within30 ? '即將到期' : '保固內');
+        const badge = `<span class="badge">${status}</span>`;
+        c.innerHTML = `
+          <div class="result">
+            <img src="${r.ImageURL || ''}" alt="product">
+            <div class="meta">
+              <div><b>${r.Brand} ${r.ProductName}</b>（型號：${r.Model}） ${badge}</div>
+              <div>保固到期：<b>${r.WarrantyUntil}</b>｜購買日期：${r.PurchaseDate}</div>
+              <div>發票：${r.InvoiceNo}｜序號：${r.SerialNo}</div>
+              <div>門市：${r.Shop}</div>
+              <div>備註：${r.Notes || '-'}｜紀錄ID：${r.RecordID}</div>
+            </div>
+          </div>`;
+        out.appendChild(c);
+      });
+    }
+    document.getElementById('btn').addEventListener('click', () => {
+      const p = (document.getElementById('phone').value || '').trim();
+      const i = (document.getElementById('inv').value || '').trim();
+      if (p.length !== 4 || i.length !== 4) {
+        render([]);
+        return;
+      }
+      const key = p + i;
+      const res = records.filter(r => (r.LookupKey || '').toString() === key);
+      render(res);
+    });
+  </script>
+</body>
+</html>
