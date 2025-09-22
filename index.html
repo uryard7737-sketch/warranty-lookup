@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>亞德醫材｜數位保固卡查詢</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+<style>
+:root{
+  --brand:#70B24D; --ink:#212121; --muted:#6b7280;
+  --bg:#f7f8f9; --card:#fff; --shadow:0 8px 18px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,"Segoe UI",Roboto,"PingFang TC",Arial,sans-serif}
+
+/* Header：白底＋品牌綠底線（Logo清楚） */
+.header{background:#fff;border-bottom:5px solid var(--brand)}
+.nav{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:8px 10px}
+.nav img{height:40px;width:auto}
+.nav .title{font-weight:700;color:var(--brand)}
+
+/* 版面（手機緊湊） */
+.wrap{max-width:1080px;margin:0 auto;padding:12px}
+.panel{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:10px;margin:6px 0}
+
+/* 表單：直排、壓縮間距 */
+.row{display:flex;flex-direction:column;gap:8px}
+.fiel
