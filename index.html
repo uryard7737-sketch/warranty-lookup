@@ -12,6 +12,7 @@
 :root{
   --brand:#70B24D; --ink:#212121; --muted:#6b7280;
   --bg:#f7f8f9; --card:#fff; --shadow:0 6px 14px rgba(0,0,0,.04);
+  --error-bg:#fef2f2; --error-border:#f5c2c2; --error-text:#8a1f1f;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,"Segoe UI",Roboto,"PingFang TC",Arial,sans-serif}
@@ -22,19 +23,18 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",s
 .nav img{height:38px;width:auto}
 .nav .title{font-weight:700;color:var(--brand)}
 
-/* 布局（超緊湊） */
+/* Layout */
 .wrap{max-width:1080px;margin:0 auto;padding:8px}
 .panel{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:8px;margin:4px 0}
 
-/* 表單：把所有垂直空白壓到最小 */
-.row{display:flex;flex-direction:column;gap:4px}           /* 欄位之間 4px */
-.field{margin:0}
-.field label{display:block;font-size:13px;color:var(--muted);margin:0 0 2px 6px}  /* 標籤下緣 2px */
-.input{width:100%;padding:12px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:16px;background:#fff;line-height:1}  /* 輸入框內邊距 12px */
-.btn{width:100%;padding:12px 14px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-size:16px;font-weight:800;letter-spacing:.5px;cursor:pointer;margin-top:6px} /* 按鈕上方 6px */
+/* Form */
+.row{display:flex;flex-direction:column;gap:4px}
+.field label{display:block;font-size:13px;color:var(--muted);margin:0 0 2px 6px}
+.input{width:100%;padding:12px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:16px;background:#fff;line-height:1}
+.btn{width:100%;padding:12px 14px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-size:16px;font-weight:800;letter-spacing:.5px;cursor:pointer;margin-top:6px}
 .btn:active{transform:translateY(1px)}
 
-/* 結果卡片：同樣超緊湊 */
+/* Result */
 .grid{display:grid;grid-template-columns:1fr;gap:8px}
 .card{display:grid;grid-template-columns:68px 1fr;gap:8px;align-items:center;background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:8px}
 .product-thumb{width:68px;height:68px;border-radius:8px;border:1px solid #eee;object-fit:cover;background:#fafafa}
@@ -47,14 +47,17 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",s
 .meta b{color:#111}
 .codepill{background:#eef2f7;border:1px solid #e3e8ef;color:#3b4a5a;border-radius:10px;padding:4px 8px;font-weight:800}
 
-/* 展開說明 */
+/* Expand */
 .toggle{margin-top:6px;background:none;border:none;color:var(--brand);font-size:14px;font-weight:700;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px}
 .toggle .arrow{transition:transform .2s ease}
 .card.open .toggle .arrow{transform:rotate(180deg)}
 .details{display:none;border-top:1px dashed #e5e7eb;margin-top:4px;padding-top:6px;color:#444;line-height:1.5;font-size:13px;white-space:pre-wrap}
 .card.open .details{display:block}
 
-/* 桌機保持舒服一些 */
+/* Error */
+.alert{background:var(--error-bg);border:1px solid var(--error-border);color:var(--error-text);padding:10px 14px;border-radius:10px;font-size:14px;font-weight:600;text-align:center}
+
+/* Desktop */
 @media (min-width:768px){
   .row{flex-direction:row;align-items:flex-end;gap:10px}
   .btn{width:auto}
@@ -82,30 +85,23 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",s
         <input id="phone" class="input" maxlength="4" inputmode="numeric" placeholder="例如：1688" />
       </div>
       <div class="field" style="flex:1 1 220px">
-        <label for="inv">發票後四碼</label>
-        <input id="inv" class="input" maxlength="4" inputmode="numeric" placeholder="例如：4485" />
+        <label for="fullname">姓名（全名）</label>
+        <input id="fullname" class="input" placeholder="例如：王小明" />
       </div>
       <button id="btn" class="btn">查詢</button>
     </div>
   </section>
 
   <div id="result" class="grid" aria-live="polite"></div>
-
-  <section class="panel">
-    <div style="font-size:12px;color:#6b7280">
-      此頁為示範；正式上線建議串接 Google 試算表或資料庫，並加入會員登入或手機簡訊驗證以保護個資。
-    </div>
-  </section>
 </main>
 
 <script>
-/* === 你的 Google Sheet CSV 連結（已填好） === */
+/* Google Sheet CSV */
 const CSV_PATH =
   "https://docs.google.com/spreadsheets/d/1KN0rAcwCFqLCUbQrVlEh8GdgiOlXa1nvA2oAq3Ex2Gk/gviz/tq?tqx=out:csv&sheet=產品保固紀錄";
 
 let DATA = [];
 
-/* 全形數字→半形，留下 0-9，限制 4 碼 */
 function normalize4(v){
   if(!v) return "";
   const map = {"０":"0","１":"1","２":"2","３":"3","４":"4","５":"5","６":"6","７":"7","８":"8","９":"9"};
@@ -134,7 +130,19 @@ function statusBadge(until){
 function render(list){
   const box=document.getElementById("result"); box.innerHTML="";
   if(!list.length){
-    box.innerHTML='<div class="panel" style="font-size:13px;color:#6b7280">查無資料。請確認輸入是否正確，或聯絡客服協助。</div>';
+    box.innerHTML=`
+      <div class="alert">
+        ❌ 查無符合的保固紀錄，請確認輸入是否正確或聯絡客服。<br><br>
+        <button id="retryBtn" class="btn" style="width:auto;padding:6px 12px;font-size:14px;margin-top:6px">
+          🔄 重新查詢
+        </button>
+      </div>`;
+    document.getElementById("retryBtn").addEventListener("click",()=>{
+      document.getElementById("phone").value="";
+      document.getElementById("fullname").value="";
+      document.getElementById("phone").focus();
+      box.innerHTML="";
+    });
     return;
   }
   list.forEach(r=>{
@@ -148,7 +156,7 @@ function render(list){
         <div class="kv"><span class="codepill">${r.Model||""}</span><span class="badge ${cls}">${label}</span></div>
         <div class="meta"><b>${r.Brand||""} ${r.ProductName||""}</b></div>
         <div class="meta">保固到期：<b>${r.WarrantyUntil||"-"}</b> ｜ 購買日期：${r.PurchaseDate||"-"}</div>
-        <div class="meta">發票：${r.InvoiceNo||"-"} ｜ 序號：${r.SerialNo||"-"}</div>
+        <div class="meta">姓名：${r.FullName||"-"} ｜ 手機：${r.Phone||"-"}</div>
         <button class="toggle" type="button"><span class="arrow">⌄</span> 保固內容說明</button>
         <div class="details">${detailsText}</div>
         <div class="meta">門市：${r.Shop||"-"}</div>
@@ -163,18 +171,17 @@ function render(list){
 
 document.getElementById("btn").addEventListener("click",()=>{
   const p = normalize4(document.getElementById("phone").value);
-  const i = normalize4(document.getElementById("inv").value);
-  if(p.length!==4 || i.length!==4){ render([]); return; }
-  const key = p + i;
+  const name = document.getElementById("fullname").value.trim();
+  if(p.length!==4 || !name){ render([]); return; }
+  const key = p + name;
   const res = DATA.filter(r => String(r.LookupKey||"") === key);
   render(res);
 });
 
-/* 初始化載入 */
 loadCSV().then(rows=>{ DATA = rows; }).catch(err=>{
   console.error("CSV 讀取失敗", err);
   document.getElementById("result").innerHTML =
-    '<div class="panel" style="font-size:13px;color:#6b7280">資料載入失敗，請確認試算表分享設定與分頁名稱。</div>';
+    '<div class="alert">⚠️ 資料載入失敗，請確認試算表分享設定與分頁名稱。</div>';
 });
 </script>
 </body>
