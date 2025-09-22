@@ -11,59 +11,58 @@
 <style>
 :root{
   --brand:#70B24D; --ink:#212121; --muted:#6b7280;
-  --bg:#f7f8f9; --card:#fff; --shadow:0 8px 18px rgba(0,0,0,.05);
+  --bg:#f7f8f9; --card:#fff; --shadow:0 6px 14px rgba(0,0,0,.04);
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,"Segoe UI",Roboto,"PingFang TC",Arial,sans-serif}
 
-/* Header：白底＋品牌綠底線（Logo清楚） */
+/* Header */
 .header{background:#fff;border-bottom:5px solid var(--brand)}
-.nav{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:8px 10px}
-.nav img{height:40px;width:auto}
+.nav{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:8px;padding:8px 10px}
+.nav img{height:38px;width:auto}
 .nav .title{font-weight:700;color:var(--brand)}
 
-/* 版面（手機緊湊） */
-.wrap{max-width:1080px;margin:0 auto;padding:12px}
-.panel{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:10px;margin:6px 0}
+/* 布局（超緊湊） */
+.wrap{max-width:1080px;margin:0 auto;padding:8px}
+.panel{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:8px;margin:4px 0}
 
-/* 表單：直排、壓縮間距 */
-.row{display:flex;flex-direction:column;gap:8px}
-.field label{display:block;font-size:13px;color:var(--muted);margin:0 0 4px 6px}
-.input{width:100%;padding:14px 16px;border:1px solid #e5e7eb;border-radius:10px;font-size:16px;background:#fff}
-.btn{width:100%;padding:14px 16px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-size:16px;font-weight:800;letter-spacing:.5px;cursor:pointer}
+/* 表單：把所有垂直空白壓到最小 */
+.row{display:flex;flex-direction:column;gap:4px}           /* 欄位之間 4px */
+.field{margin:0}
+.field label{display:block;font-size:13px;color:var(--muted);margin:0 0 2px 6px}  /* 標籤下緣 2px */
+.input{width:100%;padding:12px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:16px;background:#fff;line-height:1}  /* 輸入框內邊距 12px */
+.btn{width:100%;padding:12px 14px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-size:16px;font-weight:800;letter-spacing:.5px;cursor:pointer;margin-top:6px} /* 按鈕上方 6px */
 .btn:active{transform:translateY(1px)}
 
-/* 結果卡片：緊湊 */
-.grid{display:grid;grid-template-columns:1fr;gap:10px}
-.card{display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:center;background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:10px}
-.product-thumb{width:72px;height:72px;border-radius:10px;border:1px solid #eee;object-fit:cover;background:#fafafa}
-.kv{display:flex;gap:6px;flex-wrap:wrap;margin:-2px 0 2px}
-.badge{display:inline-flex;align-items:center;font-size:12px;font-weight:700;padding:3px 8px;border-radius:999px}
+/* 結果卡片：同樣超緊湊 */
+.grid{display:grid;grid-template-columns:1fr;gap:8px}
+.card{display:grid;grid-template-columns:68px 1fr;gap:8px;align-items:center;background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:8px}
+.product-thumb{width:68px;height:68px;border-radius:8px;border:1px solid #eee;object-fit:cover;background:#fafafa}
+.kv{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 2px}
+.badge{display:inline-flex;align-items:center;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px}
 .badge.ok{background:#eaf7ea;color:#1c5d19;border:1px solid #c9e6c7}
 .badge.soon{background:#fff6e6;color:#8a5300;border:1px solid #ffe0a6}
 .badge.expired{background:#fcebec;color:#8a1f1f;border:1px solid #f5c2c2}
-.meta{font-size:14px;line-height:1.6;margin:2px 0}
+.meta{font-size:14px;line-height:1.5;margin:1px 0}
 .meta b{color:#111}
-.codepill{background:#eef2f7;border:1px solid #e3e8ef;color:#3b4a5a;border-radius:10px;padding:6px 10px;font-weight:800}
+.codepill{background:#eef2f7;border:1px solid #e3e8ef;color:#3b4a5a;border-radius:10px;padding:4px 8px;font-weight:800}
 
 /* 展開說明 */
-.toggle{margin-top:8px;background:none;border:none;color:var(--brand);font-size:14px;font-weight:700;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px}
+.toggle{margin-top:6px;background:none;border:none;color:var(--brand);font-size:14px;font-weight:700;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px}
 .toggle .arrow{transition:transform .2s ease}
 .card.open .toggle .arrow{transform:rotate(180deg)}
-.details{display:none;border-top:1px dashed #e5e7eb;margin-top:6px;padding-top:6px;color:#444;line-height:1.6;font-size:13px;white-space:pre-wrap}
+.details{display:none;border-top:1px dashed #e5e7eb;margin-top:4px;padding-top:6px;color:#444;line-height:1.5;font-size:13px;white-space:pre-wrap}
 .card.open .details{display:block}
 
-/* 桌機維持舒服一點 */
+/* 桌機保持舒服一些 */
 @media (min-width:768px){
-  .row{flex-direction:row;align-items:flex-end;gap:12px}
-  .btn{width:auto;padding:16px 18px;font-size:16px;border-radius:12px}
-  .input{padding:16px 18px;font-size:16px;border-radius:12px}
-  .nav{padding:14px 16px}
-  .wrap{padding:20px 16px}
-  .panel{padding:14px;margin:10px 0;border-radius:16px}
-  .grid{gap:12px}
-  .card{grid-template-columns:96px 1fr;padding:14px;border-radius:16px}
-  .product-thumb{width:96px;height:96px}
+  .row{flex-direction:row;align-items:flex-end;gap:10px}
+  .btn{width:auto}
+  .wrap{padding:14px}
+  .panel{padding:10px;margin:8px 0}
+  .grid{gap:10px}
+  .card{grid-template-columns:88px 1fr;padding:10px}
+  .product-thumb{width:88px;height:88px}
 }
 </style>
 </head>
@@ -78,11 +77,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",s
 <main class="wrap">
   <section class="panel" aria-label="查詢條件">
     <div class="row">
-      <div class="field" style="flex:1 1 240px">
+      <div class="field" style="flex:1 1 220px">
         <label for="phone">手機後四碼</label>
         <input id="phone" class="input" maxlength="4" inputmode="numeric" placeholder="例如：1688" />
       </div>
-      <div class="field" style="flex:1 1 240px">
+      <div class="field" style="flex:1 1 220px">
         <label for="inv">發票後四碼</label>
         <input id="inv" class="input" maxlength="4" inputmode="numeric" placeholder="例如：4485" />
       </div>
@@ -100,13 +99,13 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",s
 </main>
 
 <script>
-/* === 設定：你的 Google Sheet CSV 連結 === */
+/* === 你的 Google Sheet CSV 連結（已填好） === */
 const CSV_PATH =
   "https://docs.google.com/spreadsheets/d/1KN0rAcwCFqLCUbQrVlEh8GdgiOlXa1nvA2oAq3Ex2Gk/gviz/tq?tqx=out:csv&sheet=產品保固紀錄";
 
 let DATA = [];
 
-/* 全形數字 → 半形，並保留 0-9 */
+/* 全形數字→半形，留下 0-9，限制 4 碼 */
 function normalize4(v){
   if(!v) return "";
   const map = {"０":"0","１":"1","２":"2","３":"3","４":"4","５":"5","６":"6","７":"7","８":"8","９":"9"};
