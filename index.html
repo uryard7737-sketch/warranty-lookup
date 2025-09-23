@@ -14,8 +14,12 @@
   --bg:#f7f8f9; --card:#fff; --shadow:0 6px 14px rgba(0,0,0,.04);
   --error-bg:#fef2f2; --error-border:#f5c2c2; --error-text:#8a1f1f;
 }
+
+/* 基礎：字距行高偏緊、清空預設外距 */
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,"Segoe UI",Roboto,"PingFang TC",Arial,sans-serif}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",-apple-system,"PingFang TC","Microsoft JhengHei",Arial,sans-serif;line-height:1.25}
+h1,h2,h3,h4,h5,h6,p,ul,ol,dl,figure,blockquote,pre{margin:0}
 
 /* Header */
 .header{background:#fff;border-bottom:5px solid var(--brand)}
@@ -23,18 +27,25 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",s
 .nav img{height:38px;width:auto}
 .nav .title{font-weight:700;color:var(--brand)}
 
-/* Layout */
+/* 版心與卡片 */
 .wrap{max-width:1080px;margin:0 auto;padding:8px}
-.panel{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:8px;margin:4px 0}
+.panel{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:8px;margin:6px 0}
 
-/* Form */
-.row{display:flex;flex-direction:column;gap:4px}
-.field label{display:block;font-size:13px;color:var(--muted);margin:0 0 2px 6px}
-.input{width:100%;padding:12px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:16px;background:#fff;line-height:1}
-.btn{width:100%;padding:12px 14px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-size:16px;font-weight:800;letter-spacing:.5px;cursor:pointer;margin-top:6px}
+/* 表單（極緊） */
+.row{display:flex;flex-direction:column;gap:6px}   /* 欄位之間 6px */
+.field label{display:block;font-size:13px;color:var(--muted);margin:0 0 2px 6px;line-height:1.2}
+.input{
+  width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;
+  font-size:16px;line-height:1.1;min-height:0; -webkit-appearance:none;appearance:none;background:#fff
+}
+.btn{
+  width:100%;padding:12px 14px;border:none;border-radius:10px;
+  background:var(--brand);color:#fff;font-size:16px;font-weight:800;letter-spacing:.5px;
+  cursor:pointer;margin-top:8px;line-height:1.1
+}
 .btn:active{transform:translateY(1px)}
 
-/* Result */
+/* 結果列表卡片（緊湊） */
 .grid{display:grid;grid-template-columns:1fr;gap:8px}
 .card{display:grid;grid-template-columns:68px 1fr;gap:8px;align-items:center;background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:8px}
 .product-thumb{width:68px;height:68px;border-radius:8px;border:1px solid #eee;object-fit:cover;background:#fafafa}
@@ -43,21 +54,21 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",s
 .badge.ok{background:#eaf7ea;color:#1c5d19;border:1px solid #c9e6c7}
 .badge.soon{background:#fff6e6;color:#8a5300;border:1px solid #ffe0a6}
 .badge.expired{background:#fcebec;color:#8a1f1f;border:1px solid #f5c2c2}
-.meta{font-size:14px;line-height:1.5;margin:1px 0}
+.meta{font-size:14px;line-height:1.45;margin:1px 0}
 .meta b{color:#111}
 .codepill{background:#eef2f7;border:1px solid #e3e8ef;color:#3b4a5a;border-radius:10px;padding:4px 8px;font-weight:800}
 
-/* Expand */
+/* 展開說明 */
 .toggle{margin-top:6px;background:none;border:none;color:var(--brand);font-size:14px;font-weight:700;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px}
 .toggle .arrow{transition:transform .2s ease}
 .card.open .toggle .arrow{transform:rotate(180deg)}
 .details{display:none;border-top:1px dashed #e5e7eb;margin-top:4px;padding-top:6px;color:#444;line-height:1.5;font-size:13px;white-space:pre-wrap}
 .card.open .details{display:block}
 
-/* Error */
+/* 錯誤提示卡 */
 .alert{background:var(--error-bg);border:1px solid var(--error-border);color:var(--error-text);padding:10px 14px;border-radius:10px;font-size:14px;font-weight:600;text-align:center}
 
-/* Desktop */
+/* 桌機稍微放鬆 */
 @media (min-width:768px){
   .row{flex-direction:row;align-items:flex-end;gap:10px}
   .btn{width:auto}
@@ -67,6 +78,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",s
   .card{grid-template-columns:88px 1fr;padding:10px}
   .product-thumb{width:88px;height:88px}
 }
+
+/* —— 超緊湊補丁：確保不被外部樣式覆寫 —— */
+.wrap,.panel,.row,.card{font-family:"Noto Sans TC",-apple-system,"PingFang TC","Microsoft JhengHei",Arial,sans-serif !important}
+.row{gap:6px !important}
+.input,.btn{line-height:1.1 !important}
 </style>
 </head>
 <body>
@@ -133,9 +149,7 @@ function render(list){
     box.innerHTML=`
       <div class="alert">
         ❌ 查無符合的保固紀錄，請確認輸入是否正確或聯絡客服。<br><br>
-        <button id="retryBtn" class="btn" style="width:auto;padding:6px 12px;font-size:14px;margin-top:6px">
-          🔄 重新查詢
-        </button>
+        <button id="retryBtn" class="btn" style="width:auto;padding:8px 12px;font-size:14px;margin-top:6px">🔄 重新查詢</button>
       </div>`;
     document.getElementById("retryBtn").addEventListener("click",()=>{
       document.getElementById("phone").value="";
@@ -178,6 +192,7 @@ document.getElementById("btn").addEventListener("click",()=>{
   render(res);
 });
 
+/* 初始化載入 */
 loadCSV().then(rows=>{ DATA = rows; }).catch(err=>{
   console.error("CSV 讀取失敗", err);
   document.getElementById("result").innerHTML =
