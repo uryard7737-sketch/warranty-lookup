@@ -1,66 +1,211 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>亞德醫材｜數位保固卡查詢</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>亞德醫材｜數位保固卡查詢</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;800&display=swap" rel="stylesheet" />
 
-<style>
-:root{
-  --brand:#70B24D; --ink:#212121; --muted:#6b7280;
-  --bg:#f7f8f9; --card:#fff; --shadow:0 6px 14px rgba(0,0,0,.04);
-  --error-bg:#fef2f2; --error-border:#f5c2c2; --error-text:#8a1f1f;
-  --info-bg:#eff6ff; --info-border:#bfdbfe; --info-text:#1e3a8a;
-}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",-apple-system,"PingFang TC","Microsoft JhengHei",Arial,sans-serif;line-height:1.25}
-h1,h2,h3,h4,h5,h6,p,ul,ol,dl,figure,blockquote,pre{margin:0}
-.header{background:#fff;border-bottom:5px solid var(--brand)}
-.nav{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:8px;padding:8px 10px}
-.nav img{height:38px;width:auto}
-.nav .title{font-weight:800;color:var(--brand)}
-.wrap{max-width:1080px;margin:0 auto;padding:8px}
-.panel{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:8px;margin:6px 0}
-.row{display:flex;flex-direction:column;gap:6px}
-.field label{display:block;font-size:13px;color:var(--muted);margin:0 0 2px 6px;line-height:1.2}
-.input{width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;font-size:16px;line-height:1.1}
-.btn{width:100%;padding:12px 14px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-size:16px;font-weight:900;cursor:pointer;margin-top:8px}
-.btn:active{transform:translateY(1px)}
-.btn[disabled]{opacity:.6;cursor:not-allowed}
-.grid{display:grid;grid-template-columns:1fr;gap:8px}
-.card{display:grid;grid-template-columns:68px 1fr;gap:8px;align-items:center;background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:8px}
-.product-thumb{width:68px;height:68px;border-radius:8px;border:1px solid #eee;object-fit:cover;background:#fafafa}
-.kv{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 2px}
-.badge{display:inline-flex;align-items:center;font-size:12px;font-weight:800;padding:2px 8px;border-radius:999px}
-.badge.ok{background:#eaf7ea;color:#1c5d19;border:1px solid #c9e6c7}
-.badge.soon{background:#fff6e6;color:#8a5300;border:1px solid #ffe0a6}
-.badge.expired{background:#fcebec;color:#8a1f1f;border:1px solid #f5c2c2}
-.meta{font-size:14px;line-height:1.45;margin:2px 0}
-.meta b{color:#111}
-.codepill{background:#eef2f7;border:1px solid #e3e8ef;color:#3b4a5a;border-radius:10px;padding:4px 8px;font-weight:900}
-.toggle{margin-top:6px;background:none;border:none;color:var(--brand);font-size:14px;font-weight:800;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:4px}
-.toggle .arrow{transition:transform .2s ease}
-.card.open .toggle .arrow{transform:rotate(180deg)}
-.details{display:none;border-top:1px dashed #e5e7eb;margin-top:4px;padding-top:6px;color:#444;line-height:1.5;font-size:13px;white-space:pre-wrap}
-.card.open .details{display:block}
+  <!-- 截圖用（每張卡一鍵截圖） -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-.alert{background:var(--error-bg);border:1px solid var(--error-border);color:var(--error-text);padding:10px 14px;border-radius:10px;font-size:14px;font-weight:700;text-align:center}
-.notice{background:var(--info-bg);border:1px solid var(--info-border);color:var(--info-text);padding:10px 14px;border-radius:10px;font-size:13px;font-weight:700}
-.small{font-size:12px;color:var(--muted);margin-top:6px;text-align:center}
+  <style>
+    :root{
+      --brand:#70B24D;
+      --ink:#1f2937;
+      --muted:#6b7280;
+      --bg:#f6f7f9;
+      --card:#ffffff;
+      --shadow:0 10px 20px rgba(0,0,0,.06);
+      --shadow2:0 6px 14px rgba(0,0,0,.05);
+      --border:#e5e7eb;
 
-@media (min-width:768px){
-  .row{flex-direction:row;align-items:flex-end;gap:10px}
-  .btn{width:auto}
-  .wrap{padding:14px}
-  .panel{padding:10px;margin:8px 0}
-  .grid{gap:10px}
-  .card{grid-template-columns:88px 1fr;padding:10px}
-  .product-thumb{width:88px;height:88px}
-}
-</style>
+      --ok-bg:#eaf7ea; --ok-tx:#1c5d19; --ok-bd:#c9e6c7;
+      --soon-bg:#fff6e6; --soon-tx:#8a5300; --soon-bd:#ffe0a6;
+      --exp-bg:#fcebec; --exp-tx:#8a1f1f; --exp-bd:#f5c2c2;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      background:var(--bg);
+      color:var(--ink);
+      font-family:"Noto Sans TC",-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",Arial,sans-serif;
+      line-height:1.35;
+    }
+
+    .header{background:#fff;border-bottom:5px solid var(--brand)}
+    .nav{
+      max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:10px;
+      padding:10px 12px;
+    }
+    .nav img{height:38px;width:auto}
+    .nav .title{font-weight:800;color:var(--brand);letter-spacing:.5px}
+    .wrap{max-width:1080px;margin:0 auto;padding:12px}
+
+    .panel{
+      background:var(--card); border-radius:14px; box-shadow:var(--shadow);
+      padding:12px; margin:10px 0;
+    }
+
+    .row{display:flex;flex-direction:column;gap:10px}
+    .field label{
+      display:block;font-size:13px;color:var(--muted);margin:0 0 4px 6px;
+    }
+    .input{
+      width:100%;
+      padding:11px 12px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      font-size:16px;
+      outline:none;
+      background:#fff;
+    }
+    .input:focus{border-color:rgba(112,178,77,.6); box-shadow:0 0 0 4px rgba(112,178,77,.14);}
+    .btn{
+      width:100%;
+      padding:12px 14px;
+      border:none;
+      border-radius:12px;
+      background:var(--brand);
+      color:#fff;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow:var(--shadow2);
+    }
+    .btn:active{transform:translateY(1px)}
+    .hint{font-size:12px;color:var(--muted);margin-top:6px}
+
+    .grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:10px}
+
+    .card{
+      background:#fff; border-radius:16px; box-shadow:var(--shadow);
+      overflow:hidden;
+      border:1px solid rgba(0,0,0,.04);
+    }
+    .card-top{
+      display:flex; gap:12px;
+      padding:12px;
+      align-items:flex-start;
+    }
+    .thumb{
+      width:96px;height:96px;flex:0 0 auto;
+      border-radius:12px;
+      border:1px solid #eee;
+      object-fit:cover;
+      background:#fafafa;
+    }
+    .main{
+      flex:1 1 auto;
+      min-width:0;
+    }
+    .topline{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:4px}
+    .codepill{
+      display:inline-flex;align-items:center;gap:6px;
+      background:#eef2f7;border:1px solid #e3e8ef;color:#334155;
+      border-radius:999px;padding:4px 10px;font-weight:900;
+      font-size:13px;
+    }
+    .badge{
+      display:inline-flex;align-items:center;
+      font-size:12px;font-weight:900;padding:3px 10px;border-radius:999px;
+      border:1px solid transparent;
+    }
+    .badge.ok{background:var(--ok-bg);color:var(--ok-tx);border-color:var(--ok-bd)}
+    .badge.soon{background:var(--soon-bg);color:var(--soon-tx);border-color:var(--soon-bd)}
+    .badge.expired{background:var(--exp-bg);color:var(--exp-tx);border-color:var(--exp-bd)}
+    .brandname{font-size:15px;font-weight:900;color:#111;margin:2px 0 6px}
+    .meta{font-size:13px;color:#111;margin:2px 0}
+    .meta span{color:var(--muted)}
+    .small{font-size:12px;color:var(--muted)}
+
+    .barwrap{margin-top:8px}
+    .barlabel{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);margin-bottom:6px}
+    .bar{
+      width:100%;height:10px;background:#eef2f7;border-radius:999px;overflow:hidden;
+      border:1px solid #e5e7eb;
+    }
+    .bar > i{display:block;height:100%;width:0%}
+
+    /* 讓進度條顏色跟狀態一致 */
+    .bar.ok > i{background:rgba(112,178,77,.95)}
+    .bar.soon > i{background:rgba(245,158,11,.95)}
+    .bar.expired > i{background:rgba(239,68,68,.95)}
+
+    .card-actions{
+      display:flex;gap:8px;flex-wrap:wrap;margin-top:10px
+    }
+    .chipbtn{
+      appearance:none;border:1px solid var(--border);background:#fff;
+      border-radius:999px;padding:7px 10px;
+      font-size:13px;font-weight:900;color:#111;
+      cursor:pointer;
+    }
+    .chipbtn.primary{border-color:rgba(112,178,77,.5); color:var(--brand)}
+    .chipbtn:active{transform:translateY(1px)}
+    .chipbtn[disabled]{opacity:.5;cursor:not-allowed}
+
+    .details{
+      display:none;
+      padding:0 12px 12px 12px;
+      border-top:1px dashed #e5e7eb;
+      color:#374151;
+      white-space:pre-wrap;
+      font-size:13px;
+    }
+    .card.open .details{display:block}
+    .toggle{
+      margin-top:8px;
+      display:inline-flex;align-items:center;gap:6px;
+      background:none;border:none;padding:0;
+      color:var(--brand);
+      font-weight:900;cursor:pointer;font-size:13px;
+    }
+    .toggle .arrow{transition:transform .2s ease}
+    .card.open .toggle .arrow{transform:rotate(180deg)}
+
+    .alert{
+      background:#fff;
+      border:1px solid #f5c2c2;
+      color:#8a1f1f;
+      padding:12px 14px;border-radius:14px;
+      font-size:14px;font-weight:800;text-align:center;
+      box-shadow:var(--shadow);
+    }
+    .subnote{
+      margin-top:8px;
+      font-size:12px;color:var(--muted);
+      text-align:center;
+    }
+
+    /* 右下角固定 LINE 客服 */
+    .fab{
+      position:fixed; right:16px; bottom:16px;
+      display:flex; flex-direction:column; gap:10px;
+      z-index:9999;
+    }
+    .fab a{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:12px 14px;
+      border-radius:999px;
+      background:var(--brand);
+      color:#fff; text-decoration:none;
+      font-weight:900;
+      box-shadow:var(--shadow);
+    }
+    .fab a.secondary{
+      background:#111827;
+    }
+
+    @media (min-width:768px){
+      .wrap{padding:16px}
+      .row{flex-direction:row;align-items:flex-end}
+      .btn{width:auto}
+      .grid{grid-template-columns:1fr;gap:14px}
+      .thumb{width:110px;height:110px}
+    }
+  </style>
 </head>
 
 <body>
@@ -75,156 +220,294 @@ h1,h2,h3,h4,h5,h6,p,ul,ol,dl,figure,blockquote,pre{margin:0}
   <section class="panel">
     <div class="row">
       <div class="field" style="flex:1 1 220px">
-        <label for="phone">手機後四碼</label>
+        <label for="phone">手機後四碼（選填）</label>
         <input id="phone" class="input" maxlength="4" inputmode="numeric" placeholder="例如：1688" />
       </div>
-      <div class="field" style="flex:1 1 220px">
-        <label for="fullname">姓名（全名）</label>
+
+      <div class="field" style="flex:1 1 260px">
+        <label for="fullname">姓名（全名／選填）</label>
         <input id="fullname" class="input" placeholder="例如：王小明" />
       </div>
-      <button id="btn" class="btn" type="button">查詢</button>
+
+      <div class="field" style="flex:1 1 260px">
+        <label for="serial">序號 Serial No（可直接用序號查）</label>
+        <input id="serial" class="input" placeholder="例如：SN123456 / 盒上序號" />
+      </div>
+
+      <button id="btn" class="btn">查詢</button>
     </div>
 
-    <div id="runtimeNotice" class="small"></div>
+    <div class="hint" id="apiHint">API 版本：—</div>
   </section>
 
   <div id="result" class="grid" aria-live="polite"></div>
+  <div class="subnote">若查無資料或圖片未顯示，請聯絡亞德客服協助處理。</div>
 </main>
 
+<!-- 右下角固定客服 -->
+<div class="fab">
+  <!-- 改成你們官方 LINE 連結（或 LINE@） -->
+  <a id="lineFab" href="#" target="_blank" rel="noopener">LINE 客服</a>
+  <a class="secondary" href="https://www.uryard.com.tw/" target="_blank" rel="noopener">前往官網</a>
+</div>
+
 <script>
-/** ✅ 你的保固 API **/
+/** =========================
+ *  設定區（你只需要改這裡）
+ *  ========================= */
 const API_URL   = "https://script.google.com/macros/s/AKfycbyg6WCxrKmduqdR6IimD865ugcSjrXvbpNLIb5v-hkeCmJZX-uvs-NbMpIXUBDULTnIVg/exec";
 const API_TOKEN = "Uryardwarranty_ALL";
 
-/** 讓「就算 JS 爆炸」也會在頁面顯示錯誤 */
-(function setupHardErrorUI(){
-  const show = (msg) => {
-    const box = document.getElementById("result");
-    if (!box) return;
-    box.innerHTML = `<div class="alert">⚠️ 前端程式發生錯誤：<br>${escapeHtml(String(msg))}<br><br>請按 Ctrl+F5 重新整理，若仍出現請把 Console 紅字截圖給我。</div>`;
-  };
-  window.addEventListener("error", (e) => show(e.message || e.error || "unknown error"));
-  window.addEventListener("unhandledrejection", (e) => show(e.reason || "promise rejection"));
-})();
+// 你們 LINE 客服（請換成你真正要給客人的連結）
+const LINE_URL  = "https://line.me/R/ti/p/@xxxxxxxx"; // ← 改成你們LINE@
+document.getElementById("lineFab").href = LINE_URL;
 
-function escapeHtml(s){
-  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/** =========================
+ *  小工具
+ *  ========================= */
+function esc(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;").replaceAll("<","&lt;")
+    .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
-function parseTWDateToISO(s){
-  // 支援 yyyy/MM/dd 或 yyyy-MM-dd
-  if (!s) return "";
-  const t = String(s).trim();
-  const m1 = t.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
-  if (!m1) return "";
-  const y = Number(m1[1]), mo = Number(m1[2]), d = Number(m1[3]);
-  if (!y || !mo || !d) return "";
-  return `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+function parseDateLoose(s){
+  if(!s) return null;
+  // 你的 API 已經是 yyyy/MM/dd，這裡兼容一下
+  const t = String(s).trim().replaceAll("-","/");
+  const d = new Date(t);
+  if(!isNaN(d.getTime())) return d;
+  // 手動拆 yyyy/MM/dd
+  const m = t.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+  if(!m) return null;
+  return new Date(Number(m[1]), Number(m[2])-1, Number(m[3]));
 }
 
-function statusBadge(until){
-  // until: yyyy/MM/dd
-  const iso = parseTWDateToISO(until);
-  const exp = iso ? new Date(iso + "T23:59:59") : new Date(NaN);
+function badgeByUntil(until){
+  const exp = parseDateLoose(until);
   const now = new Date();
-  const days = (exp - now) / 86400000;
+  if(!exp) return {label:"—", cls:"ok", daysLeft:null};
 
-  if (isNaN(exp.getTime())) return ["—","ok"];
-  if (exp < now) return ["已過保","expired"];
-  if (days <= 30) return ["即將到期","soon"];
-  return ["保固內","ok"];
+  const ms = exp.getTime() - now.getTime();
+  const daysLeft = Math.ceil(ms / 86400000);
+
+  if (daysLeft < 0) return {label:"已過保", cls:"expired", daysLeft};
+  if (daysLeft <= 30) return {label:"即將到期", cls:"soon", daysLeft};
+  return {label:"保固內", cls:"ok", daysLeft};
 }
 
-function setLoading(isLoading){
-  const btn = document.getElementById("btn");
-  if (!btn) return;
-  btn.disabled = isLoading;
-  btn.textContent = isLoading ? "查詢中…" : "查詢";
+function pctFromDaysLeft(daysLeft){
+  // 用 365 天當滿格顯示（你也可以改成 WarrantyMonths*30 但需要更多欄位）
+  const MAX = 365;
+  if(daysLeft === null) return 0;
+  if(daysLeft <= 0) return 0;
+  if(daysLeft >= MAX) return 100;
+  return Math.round((daysLeft / MAX) * 100);
 }
 
-function render(list, versionText){
+function pickImageUrl(r){
+  // 你目前後端已會補 ImageURL；這裡再保險用 ProductImageURL
+  const url = r.ProductImageURL || r.ImageURL || "";
+  return String(url).trim();
+}
+
+function showAlert(msg){
+  document.getElementById("result").innerHTML = `<div class="alert">${msg}</div>`;
+}
+
+/** =========================
+ *  截圖：把某張卡存成 PNG
+ *  ========================= */
+async function downloadCardPng(cardEl, filename){
+  // 暫時把陰影保留，截圖看起來更像卡片
+  const canvas = await html2canvas(cardEl, {
+    backgroundColor: "#ffffff",
+    scale: 2,
+    useCORS: true
+  });
+  const a = document.createElement("a");
+  a.href = canvas.toDataURL("image/png");
+  a.download = filename;
+  a.click();
+}
+
+/** =========================
+ *  render（卡片式顯示 + 天數條 + LINE + 截圖）
+ *  ========================= */
+function render(rows){
   const box = document.getElementById("result");
   box.innerHTML = "";
 
-  const notice = document.getElementById("runtimeNotice");
-  if (notice) notice.textContent = versionText ? `API 版本：${versionText}` : "";
-
-  if(!Array.isArray(list) || list.length === 0){
-    box.innerHTML = `<div class="alert">❌ 查無符合的保固紀錄，請確認輸入是否正確或聯絡客服。</div>`;
+  if(!rows || !rows.length){
+    showAlert("❌ 查無符合的保固紀錄，請確認輸入是否正確或聯絡客服。");
     return;
   }
 
-  list.forEach(r=>{
-    const [label,cls] = statusBadge(r.WarrantyUntil);
-    const detailsText = (r.WarrantyText || "").trim() || "本產品保固條款請依原廠為準。";
-    const img = (r.ProductImageURL || r.ImageURL || "").trim() || "https://dummyimage.com/200x200/eeeeee/000000&text=Product";
+  rows.forEach((r, idx) => {
+    const badge = badgeByUntil(r.WarrantyUntil);
+    const pct = pctFromDaysLeft(badge.daysLeft);
 
-    const card = document.createElement("div");
+    const model = esc(r.Model || "-");
+    const brand = esc(r.Brand || "");
+    const pname = esc(r.ProductName || "");
+    const serial = esc(r.SerialNo || r.Serial || "");
+    const shop = esc(r.Shop || "-");
+    const recordId = esc(r.RecordID || "-");
+    const notes = esc(r.Notes || "-");
+    const fullName = esc(r.FullName || "-");
+    const phone = esc(r.Phone || "-");
+    const purchaseDate = esc(r.PurchaseDate || "-");
+    const until = esc(r.WarrantyUntil || "-");
+    const wText = (r.WarrantyText || "").trim() || "本產品保固條款請依原廠為準。";
+
+    const imgUrl = pickImageUrl(r);
+
+    const card = document.createElement("section");
     card.className = "card";
+    card.setAttribute("data-idx", String(idx));
+
+    // 卡片內：圖片載不到就換成 placeholder（不會整張破）
+    const placeholder = "https://dummyimage.com/400x400/eeeeee/000000&text=Product";
+
     card.innerHTML = `
-      <img class="product-thumb" src="${img}" alt="product"
-           onerror="this.onerror=null;this.src='https://dummyimage.com/200x200/eeeeee/000000&text=Product';">
-      <div>
-        <div class="kv">
-          <span class="codepill">${escapeHtml(String(r.Model||""))}</span>
-          <span class="badge ${cls}">${label}</span>
+      <div class="card-top">
+        <img class="thumb"
+          src="${esc(imgUrl || placeholder)}"
+          alt="product"
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+          onerror="this.onerror=null;this.src='${placeholder}';"
+        />
+
+        <div class="main">
+          <div class="topline">
+            <span class="codepill">型號：${model}</span>
+            <span class="badge ${badge.cls}">${badge.label}</span>
+          </div>
+
+          <div class="brandname">${brand} ${pname}</div>
+
+          <div class="meta"><span>📅 保固到期：</span><b>${until}</b></div>
+          <div class="meta"><span>📅 購買日期：</span>${purchaseDate}</div>
+
+          ${serial ? `<div class="meta"><span>🔖 序號：</span>${serial}</div>` : ``}
+          <div class="meta"><span>👤 客戶：</span>${fullName} ｜ ${phone}</div>
+
+          <div class="barwrap">
+            <div class="barlabel">
+              <span>保固剩餘天數</span>
+              <b>${badge.daysLeft === null ? "—" : (badge.daysLeft < 0 ? `已過期 ${Math.abs(badge.daysLeft)} 天` : `${badge.daysLeft} 天`)}</b>
+            </div>
+            <div class="bar ${badge.cls}"><i style="width:${pct}%"></i></div>
+            <div class="small" style="margin-top:6px">※ 進度條以 365 天為視覺尺度（方便一眼判讀）</div>
+          </div>
+
+          <div class="card-actions">
+            <button class="chipbtn primary btnLine" type="button">LINE 客服</button>
+            <button class="chipbtn btnShot" type="button">一鍵截圖保固卡</button>
+            <button class="chipbtn btnCopy" type="button">複製紀錄ID</button>
+            <button class="toggle" type="button"><span class="arrow">⌄</span> 保固內容說明</button>
+          </div>
+
+          <div class="small" style="margin-top:8px">門市：${shop}　｜　備註：${notes}　｜　紀錄ID：${recordId}</div>
         </div>
-        <div class="meta"><b>${escapeHtml(String((r.Brand||"") + " " + (r.ProductName||"")).trim())}</b></div>
-        <div class="meta">📅 保固到期：<b>${escapeHtml(String(r.WarrantyUntil||"-"))}</b></div>
-        <div class="meta">📅 購買日期：${escapeHtml(String(r.PurchaseDate||"-"))}</div>
-        <div class="meta">姓名：${escapeHtml(String(r.FullName||"-"))} ｜ 手機：${escapeHtml(String(r.Phone||"-"))}</div>
-
-        <button class="toggle" type="button"><span class="arrow">⌄</span> 保固內容說明</button>
-        <div class="details">${escapeHtml(detailsText)}</div>
-
-        <div class="meta">門市：${escapeHtml(String(r.Shop||"-"))}</div>
-        <div class="meta">備註：${escapeHtml(String(r.Notes||"-"))} ｜ 紀錄ID：${escapeHtml(String(r.RecordID||"-"))}</div>
       </div>
+
+      <div class="details">${esc(wText)}</div>
     `;
+
+    // 事件綁定
+    const btnLine = card.querySelector(".btnLine");
+    btnLine.addEventListener("click", () => window.open(LINE_URL, "_blank", "noopener"));
+
+    const btnCopy = card.querySelector(".btnCopy");
+    btnCopy.addEventListener("click", async () => {
+      try{
+        await navigator.clipboard.writeText(String(r.RecordID || ""));
+        btnCopy.textContent = "已複製 ✅";
+        setTimeout(()=>btnCopy.textContent="複製紀錄ID", 900);
+      }catch(e){
+        alert("瀏覽器不允許複製，請手動複製紀錄ID：" + String(r.RecordID||""));
+      }
+    });
+
+    const btnShot = card.querySelector(".btnShot");
+    btnShot.addEventListener("click", async () => {
+      btnShot.disabled = true;
+      btnShot.textContent = "截圖中...";
+      const safeName = (r.Model || "warranty").toString().replace(/[^\w\-]+/g,"_");
+      await downloadCardPng(card, `保固卡_${safeName}.png`);
+      btnShot.disabled = false;
+      btnShot.textContent = "一鍵截圖保固卡";
+    });
+
+    const toggle = card.querySelector(".toggle");
+    toggle.addEventListener("click", () => card.classList.toggle("open"));
+
     box.appendChild(card);
   });
-
-  document.querySelectorAll(".toggle").forEach(btn=>{
-    btn.addEventListener("click", ()=> btn.closest(".card").classList.toggle("open"));
-  });
 }
 
-async function doSearch(){
+/** =========================
+ *  查詢流程（支援序號/姓名手機）
+ *  ========================= */
+async function queryWarranty(){
   const phone = document.getElementById("phone").value.trim();
-  const name  = document.getElementById("fullname").value.trim();
+  const name = document.getElementById("fullname").value.trim();
+  const serial = document.getElementById("serial").value.trim();
 
-  if (phone.length !== 4 || !name){
-    render([], "");
-    return;
+  // 只輸序號也能查：需要後端支援 serial 參數
+  // 我前端會優先用序號查；如果後端還沒加，就會提示你需要加後端那段。
+  let url = "";
+
+  if(serial){
+    url = `${API_URL}?token=${encodeURIComponent(API_TOKEN)}&serial=${encodeURIComponent(serial)}`;
+  }else{
+    if(phone.length !== 4 || !name){
+      showAlert("請輸入：手機後四碼＋姓名，或直接輸入序號。");
+      return;
+    }
+    url = `${API_URL}?token=${encodeURIComponent(API_TOKEN)}&phoneLast4=${encodeURIComponent(phone)}&fullName=${encodeURIComponent(name)}`;
   }
-
-  setLoading(true);
 
   try{
-    // cache bust，避免被瀏覽器/中繼層快取舊資料
-    const qs = `token=${encodeURIComponent(API_TOKEN)}&phoneLast4=${encodeURIComponent(phone)}&fullName=${encodeURIComponent(name)}&t=${Date.now()}`;
-    const url = `${API_URL}?${qs}`;
+    const res = await fetch(url, { cache: "no-store" });
+    const data = await res.json();
 
-    const resp = await fetch(url, { method: "GET" });
-    const data = await resp.json();
+    document.getElementById("apiHint").textContent = `API 版本：${data.version || "—"}`;
 
-    if (data && data.ok){
-      render(data.rows || [], data.version || "");
-    } else {
-      render([], (data && data.version) ? data.version : "");
+    if(!data.ok){
+      // 如果是序號查，但後端沒支援，通常會回 missing params / unauthorized / 或 ok:true rows:[]
+      if(serial){
+        showAlert("目前後端尚未支援「只輸入序號查詢」。我已在訊息下方給你一段 Apps Script 最小修改，貼上部署後就會生效。");
+        return;
+      }
+      showAlert("❌ 查詢失敗，請確認輸入資料或稍後再試。");
+      return;
     }
+
+    // 若你同時填了姓名/手機 + 序號，後端序號查回來後也可以再做一次前端過濾（保險）
+    let rows = Array.isArray(data.rows) ? data.rows : [];
+    if(serial){
+      const s = serial.toLowerCase();
+      rows = rows.filter(r => String(r.SerialNo || r.Serial || "").toLowerCase().includes(s));
+    }
+
+    render(rows);
   }catch(e){
-    // 這裡會顯示在頁面上（不用看 console）
-    throw e;
-  }finally{
-    setLoading(false);
+    showAlert("❌ 查詢失敗（網路或 API 異常）。請稍後再試或聯絡客服。");
   }
 }
 
-document.getElementById("btn").addEventListener("click", doSearch);
-document.getElementById("phone").addEventListener("keydown", (e)=>{ if(e.key==="Enter") doSearch(); });
-document.getElementById("fullname").addEventListener("keydown", (e)=>{ if(e.key==="Enter") doSearch(); });
-</script>
+document.getElementById("btn").addEventListener("click", queryWarranty);
 
+// 方便客人：按 Enter 直接查
+["phone","fullname","serial"].forEach(id=>{
+  document.getElementById(id).addEventListener("keydown",(e)=>{
+    if(e.key === "Enter") queryWarranty();
+  });
+});
+</script>
 </body>
 </html>
