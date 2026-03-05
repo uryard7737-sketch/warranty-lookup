@@ -12,6 +12,7 @@
   --brand:#70B24D; --ink:#212121; --muted:#6b7280;
   --bg:#f7f8f9; --card:#fff; --shadow:0 6px 14px rgba(0,0,0,.04);
   --error-bg:#fef2f2; --error-border:#f5c2c2; --error-text:#8a1f1f;
+  --info-bg:#eef6ff; --info-border:#cfe3ff; --info-text:#194b8a;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -27,6 +28,7 @@ h1,h2,h3,h4,h5,h6,p,ul,ol,dl,figure,blockquote,pre{margin:0}
 .field label{display:block;font-size:13px;color:var(--muted);margin:0 0 2px 6px;line-height:1.2}
 .input{width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;font-size:16px;line-height:1.1}
 .btn{width:100%;padding:12px 14px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin-top:8px}
+.btn:disabled{opacity:.7;cursor:not-allowed}
 .btn:active{transform:translateY(1px)}
 .grid{display:grid;grid-template-columns:1fr;gap:8px}
 .card{display:grid;grid-template-columns:68px 1fr;gap:8px;align-items:center;background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:8px}
@@ -45,6 +47,7 @@ h1,h2,h3,h4,h5,h6,p,ul,ol,dl,figure,blockquote,pre{margin:0}
 .details{display:none;border-top:1px dashed #e5e7eb;margin-top:4px;padding-top:6px;color:#444;line-height:1.5;font-size:13px;white-space:pre-wrap}
 .card.open .details{display:block}
 .alert{background:var(--error-bg);border:1px solid var(--error-border);color:var(--error-text);padding:10px 14px;border-radius:10px;font-size:14px;font-weight:600;text-align:center}
+.info{background:var(--info-bg);border:1px solid var(--info-border);color:var(--info-text);padding:10px 14px;border-radius:10px;font-size:14px;font-weight:700;text-align:center}
 @media (min-width:768px){
   .row{flex-direction:row;align-items:flex-end;gap:10px}
   .btn{width:auto}
@@ -86,6 +89,8 @@ h1,h2,h3,h4,h5,h6,p,ul,ol,dl,figure,blockquote,pre{margin:0}
 const API_URL = "https://script.google.com/macros/s/AKfycbyg6WCxrKmduqdR6IimD865ugcSjrXvbpNLIb5v-hkeCmJZX-uvs-NbMpIXUBDULTnIVg/exec";
 const API_TOKEN = "Uryardwarranty_ALL";
 
+const FALLBACK_IMG = "https://dummyimage.com/200x200/eeeeee/000000&text=Product";
+
 function statusBadge(until){
   const exp=new Date(until), now=new Date();
   const days=(exp-now)/86400000;
@@ -95,46 +100,119 @@ function statusBadge(until){
   return ["保固內","ok"];
 }
 
+function driveToThumbUrl(url){
+  if(!url) return "";
+  const s = String(url).trim();
+
+  let m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if(!m) m = s.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if(!m) return s;
+
+  const id = m[1];
+  return `https://drive.google.com/thumbnail?id=${id}&sz=w800`;
+}
+
+function pickImageUrl(r){
+  const raw = (r && (r.ProductImageURL || r.ImageURL)) ? (r.ProductImageURL || r.ImageURL) : "";
+  const thumb = driveToThumbUrl(raw);
+  return {
+    raw: raw || "",
+    display: thumb || raw || ""
+  };
+}
+
 function render(list){
-  const box=document.getElementById("result"); box.innerHTML="";
+  const box=document.getElementById("result");
+  box.innerHTML="";
+
   if(!list.length){
     box.innerHTML=`<div class="alert">❌ 查無符合的保固紀錄，請確認輸入是否正確或聯絡客服。</div>`;
     return;
   }
+
   list.forEach(r=>{
     const [label,cls]=statusBadge(r.WarrantyUntil);
     const detailsText = (r.WarrantyText||"").trim() || "本產品保固條款請依原廠為準。";
+    const img = pickImageUrl(r);
+
     const card=document.createElement("div");
     card.className="card";
     card.innerHTML=`
-      <img class="product-thumb" src="${r.ProductImageURL || r.ImageURL || 'https://dummyimage.com/200x200/eeeeee/000000&text=Product'}" alt="product">
+      <img class="product-thumb"
+           src="${img.display || FALLBACK_IMG}"
+           alt="product"
+           loading="lazy"
+           referrerpolicy="no-referrer"
+           data-raw="${escapeHtml(img.raw)}">
       <div>
-        <div class="kv"><span class="codepill">${r.Model||""}</span><span class="badge ${cls}">${label}</span></div>
-        <div class="meta"><b>${r.Brand||""} ${r.ProductName||""}</b></div>
-        <div class="meta">📅 保固到期：<b>${r.WarrantyUntil||"-"}</b></div>
-        <div class="meta">📅 購買日期：${r.PurchaseDate||"-"}</div>
-        <div class="meta">姓名：${r.FullName||"-"} ｜ 手機：${r.Phone||"-"}</div>
+        <div class="kv">
+          <span class="codepill">${escapeHtml(r.Model||"")}</span>
+          <span class="badge ${cls}">${label}</span>
+        </div>
+        <div class="meta"><b>${escapeHtml((r.Brand||"") + (r.Brand ? " " : "") + (r.ProductName||""))}</b></div>
+        <div class="meta">📅 保固到期：<b>${escapeHtml(r.WarrantyUntil||"-")}</b></div>
+        <div class="meta">📅 購買日期：${escapeHtml(r.PurchaseDate||"-")}</div>
+        <div class="meta">姓名：${escapeHtml(r.FullName||"-")} ｜ 手機：${escapeHtml(r.Phone||"-")}</div>
         <button class="toggle" type="button"><span class="arrow">⌄</span> 保固內容說明</button>
-        <div class="details">${detailsText}</div>
-        <div class="meta">門市：${r.Shop||"-"}</div>
-        <div class="meta">備註：${r.Notes||"-"} ｜ 紀錄ID：${r.RecordID||"-"}</div>
+        <div class="details">${escapeHtml(detailsText)}</div>
+        <div class="meta">門市：${escapeHtml(r.Shop||"-")}</div>
+        <div class="meta">備註：${escapeHtml(r.Notes||"-")} ｜ 紀錄ID：${escapeHtml(r.RecordID||"-")}</div>
       </div>`;
+
     box.appendChild(card);
   });
+
+  // ✅ 圖片失敗時 fallback（避免破圖）
+  box.querySelectorAll("img.product-thumb").forEach(img => {
+    img.onerror = () => {
+      const raw = img.getAttribute("data-raw") || "";
+      const retry = driveToThumbUrl(raw);
+      if (retry && img.src !== retry) {
+        img.src = retry;
+        return;
+      }
+      img.src = FALLBACK_IMG;
+    };
+  });
+
   document.querySelectorAll(".toggle").forEach(btn=>{
-    btn.addEventListener("click",()=>{ btn.closest(".card").classList.toggle("open"); });
+    btn.addEventListener("click",()=>{
+      btn.closest(".card").classList.toggle("open");
+    });
   });
 }
 
-document.getElementById("btn").addEventListener("click",()=>{
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, s => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[s]));
+}
+
+document.getElementById("btn").addEventListener("click", async ()=>{
   const phone = document.getElementById("phone").value.trim();
   const name = document.getElementById("fullname").value.trim();
-  if(phone.length!==4 || !name){ render([]); return; }
 
-  fetch(`${API_URL}?token=${API_TOKEN}&phoneLast4=${phone}&fullName=${encodeURIComponent(name)}`)
-    .then(r=>r.json())
-    .then(data=>{ if(data.ok) render(data.rows); else render([]); })
-    .catch(()=>{ render([]); });
+  if(phone.length!==4 || !name){
+    render([]);
+    return;
+  }
+
+  const btn = document.getElementById("btn");
+  btn.disabled = true;
+  const box=document.getElementById("result");
+  box.innerHTML = `<div class="info">查詢中…</div>`;
+
+  try{
+    const url = `${API_URL}?token=${API_TOKEN}&phoneLast4=${encodeURIComponent(phone)}&fullName=${encodeURIComponent(name)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if(data && data.ok) render(data.rows || []);
+    else render([]);
+  }catch(e){
+    render([]);
+  }finally{
+    btn.disabled = false;
+  }
 });
 </script>
 </body>
