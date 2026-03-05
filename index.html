@@ -107,7 +107,7 @@ function render(list){
     const card=document.createElement("div");
     card.className="card";
     card.innerHTML=`
-      <img class="product-thumb" src="${r.ImageURL||'https://dummyimage.com/200x200/eeeeee/000000&text=Product'}" alt="product">
+      <img class="product-thumb" src="${r.ProductImageURL || r.ImageURL || 'https://dummyimage.com/200x200/eeeeee/000000&text=Product'}" alt="product">
       <div>
         <div class="kv"><span class="codepill">${r.Model||""}</span><span class="badge ${cls}">${label}</span></div>
         <div class="meta"><b>${r.Brand||""} ${r.ProductName||""}</b></div>
