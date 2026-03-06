@@ -83,14 +83,6 @@
       font-size:14px;font-weight:900;text-align:center;
       box-shadow:var(--shadow);
     }
-    .notice{
-      background:#fff;
-      border:1px solid #bfdbfe;
-      color:#1e3a8a;
-      padding:10px 12px;border-radius:14px;
-      font-size:13px;font-weight:800;
-      box-shadow:var(--shadow2);
-    }
 
     .card{
       background:#fff;border-radius:18px;
@@ -104,6 +96,7 @@
       width:110px;height:110px;flex:0 0 auto;
       border-radius:14px;border:1px solid #eee;
       object-fit:cover;background:#fafafa;
+      display:block;
     }
     .main{flex:1 1 auto;min-width:0}
     .topline{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:4px}
@@ -163,7 +156,6 @@
     }
     .card.open .details{display:block}
 
-    /* 右上角截圖按鈕 */
     .shot{
       position:absolute; top:10px; right:10px;
       border:none; cursor:pointer;
@@ -174,7 +166,6 @@
     }
     .shot[disabled]{opacity:.6;cursor:not-allowed}
 
-    /* 右下角浮動客服 */
     .fab{
       position:fixed; right:16px; bottom:16px;
       display:flex; flex-direction:column; gap:10px;
@@ -234,25 +225,24 @@
   <div id="result" class="grid" aria-live="polite"></div>
 </main>
 
-<!-- 右下角固定客服 -->
 <div class="fab">
   <a id="lineFab" href="#" target="_blank" rel="noopener">LINE 客服</a>
   <a class="secondary" href="https://www.uryard.com.tw/" target="_blank" rel="noopener">前往官網</a>
 </div>
 
 <script>
-/** ✅ 你的保固 API **/
 const API_URL   = "https://script.google.com/macros/s/AKfycbyg6WCxrKmduqdR6IimD865ugcSjrXvbpNLIb5v-hkeCmJZX-uvs-NbMpIXUBDULTnIVg/exec";
 const API_TOKEN = "Uryardwarranty_ALL";
 
-/** ✅ 你們 LINE 客服（改成你真正的 LINE@ 連結） */
-const LINE_URL  = "https://line.me/R/ti/p/@uryard"; // ← 改成你們LINE@
+const LINE_URL  = "https://line.me/R/ti/p/@uryard";
 document.getElementById("lineFab").href = LINE_URL;
 
 function esc(s){
   return String(s ?? "")
-    .replaceAll("&","&amp;").replaceAll("<","&lt;")
-    .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
 }
 
@@ -276,7 +266,6 @@ function badgeByUntil(until){
 }
 
 function pctFromDaysLeft(daysLeft){
-  // 視覺用：用 365 天當滿格（簡單好懂）
   const MAX = 365;
   if(daysLeft === null) return 0;
   if(daysLeft <= 0) return 0;
@@ -285,8 +274,22 @@ function pctFromDaysLeft(daysLeft){
 }
 
 function pickImageUrl(r){
-  const url = (r.ProductImageURL || r.ImageURL || "").toString().trim();
-  return url;
+  return String(
+    r.ProductImageURL ||
+    r.ImageURL ||
+    ""
+  ).trim();
+}
+
+function withCacheBust(url){
+  if(!url) return "";
+  const joiner = url.includes("?") ? "&" : "?";
+  return url + joiner + "v=" + Date.now();
+}
+
+function fallbackProductImage(imgEl){
+  imgEl.onerror = null;
+  imgEl.src = "https://dummyimage.com/400x400/eeeeee/000000&text=Product";
 }
 
 function showAlert(msg){
@@ -310,12 +313,13 @@ function render(rows){
     return;
   }
 
-  rows.forEach((r, idx) => {
+  rows.forEach((r) => {
     const badge = badgeByUntil(r.WarrantyUntil);
     const pct = pctFromDaysLeft(badge.daysLeft);
 
     const placeholder = "https://dummyimage.com/400x400/eeeeee/000000&text=Product";
-    const imgUrl = pickImageUrl(r) || placeholder;
+    const rawImgUrl = pickImageUrl(r);
+    const imgUrl = rawImgUrl ? withCacheBust(rawImgUrl) : placeholder;
 
     const model = esc(r.Model || "-");
     const brand = esc(r.Brand || "");
@@ -340,9 +344,9 @@ function render(rows){
         <img class="thumb"
           src="${esc(imgUrl)}"
           alt="product"
-          crossorigin="anonymous"
+          loading="lazy"
           referrerpolicy="no-referrer"
-          onerror="this.onerror=null;this.src='${placeholder}';"
+          onerror="fallbackProductImage(this)"
         />
 
         <div class="main">
@@ -380,7 +384,6 @@ function render(rows){
       <div class="details">${esc(wText)}</div>
     `;
 
-    // 綁事件
     card.querySelector(".btnLine").addEventListener("click", () => window.open(LINE_URL, "_blank", "noopener"));
 
     const btnCopy = card.querySelector(".btnCopy");
@@ -434,7 +437,7 @@ async function queryWarranty(){
   setLoading(true);
 
   try{
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url, { cache: "no-store", mode: "cors" });
     const data = await res.json();
 
     document.getElementById("apiHint").textContent = `API 版本：${data.version || "—"}`;
