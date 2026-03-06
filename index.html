@@ -283,8 +283,14 @@ function pickImageUrl(r){
 
 function withCacheBust(url){
   if(!url) return "";
-  const joiner = url.includes("?") ? "&" : "?";
-  return url + joiner + "v=" + Date.now();
+
+  const s = String(url).trim();
+
+  // ✅ data:image/base64 不能加 cache bust
+  if (s.startsWith("data:image/")) return s;
+
+  const joiner = s.includes("?") ? "&" : "?";
+  return s + joiner + "v=" + Date.now();
 }
 
 function fallbackProductImage(imgEl){
